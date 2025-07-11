@@ -2,7 +2,7 @@
 
 import React, { useState, use } from 'react';
 import { notFound } from 'next/navigation';
-import Header from '../../components/Header';
+import Header from '../../../components/Header';
 import Footer from '../../components/Footer';
 import ArtisanHero from './components/ArtisanHero';
 import ArtisanPortfolio from './components/ArtisanPortfolio';
