@@ -1,0 +1,323 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  password    String
+  name        String
+  role        UserRole
+  profileImage String?
+  phone       String?
+  location    String?
+  bio         String?
+  verified    Boolean  @default(false)
+  emailVerified Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastActive  DateTime @default(now())
+
+  // Relations
+  artisanProfile ArtisanProfile?
+  customerOrders Order[] @relation("CustomerOrders")
+  artisanOrders  Order[] @relation("ArtisanOrders")
+  sentMessages   Message[] @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageReceiver")
+  reviews        Review[]
+  payments       Payment[]
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+model ArtisanProfile {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @unique @db.ObjectId
+  specialty        String
+  category         String
+  experienceYears  Int?
+  responseTime     String   @default("Within 24 hours")
+  startingPrice    Float?
+  rating           Float    @default(0)
+  totalOrders      Int      @default(0)
+  completedOrders  Int      @default(0)
+  totalReviews     Int      @default(0)
+  skills           String[]
+  languages        String[] @default(["English"])
+  availabilityStatus String @default("available")
+  portfolioCount   Int      @default(0)
+  featured         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioItems PortfolioItem[]
+  services       Service[]
+
+  @@map("artisan_profiles")
+}
+
+model PortfolioItem {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  artisanId   String   @db.ObjectId
+  title       String
+  description String?
+  category    String?
+  price       Float?
+  timeframe   String?
+  images      String[]
+  tags        String[]
+  featured    Boolean  @default(false)
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  artisan ArtisanProfile @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+
+  @@map("portfolio_items")
+}
+
+model Service {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  artisanId   String      @db.ObjectId
+  name        String
+  description String?
+  category    String?
+  priceType   PriceType   @default(FIXED)
+  minPrice    Float?
+  maxPrice    Float?
+  timeframe   String?
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  artisan ArtisanProfile @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+  orders  Order[]
+
+  @@map("services")
+}
+
+model Order {
+  id                  String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber         String      @unique
+  customerId          String      @db.ObjectId
+  artisanId           String      @db.ObjectId
+  serviceId           String?     @db.ObjectId
+  
+  // Order details
+  title               String
+  description         String
+  category            String?
+  
+  // Pricing
+  quotedPrice         Float?
+  finalPrice          Float?
+  currency            String      @default("USD")
+  
+  // Status and timeline
+  status              OrderStatus @default(QUOTE_REQUESTED)
+  priority            Priority    @default(MEDIUM)
+  deadline            DateTime?
+  estimatedCompletion DateTime?
+  
+  // Customer requirements
+  budgetRange         String?
+  timelinePreference  String?
+  specialRequirements String?
+  attachments         String[]
+  
+  // Progress tracking
+  progressPercentage  Int         @default(0)
+  milestones          Json?
+  
+  // Timestamps
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  acceptedAt          DateTime?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+
+  // Relations
+  customer   User      @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
+  artisan    User      @relation("ArtisanOrders", fields: [artisanId], references: [id], onDelete: Cascade)
+  service    Service?  @relation(fields: [serviceId], references: [id])
+  messages   Message[]
+  payments   Payment[]
+  reviews    Review[]
+
+  @@map("orders")
+}
+
+model Message {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderId        String?     @db.ObjectId
+  senderId       String      @db.ObjectId
+  receiverId     String      @db.ObjectId
+  content        String
+  messageType    MessageType @default(TEXT)
+  attachments    String[]
+  metadata       Json?
+  readAt         DateTime?
+  createdAt      DateTime    @default(now())
+
+  // Relations
+  order    Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sender   User   @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User   @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Payment {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderId         String        @db.ObjectId
+  customerId      String        @db.ObjectId
+  artisanId       String        @db.ObjectId
+  
+  // Payment details
+  amount          Float
+  currency        String        @default("USD")
+  paymentMethod   PaymentMethod
+  paymentProvider String?
+  transactionId   String?
+  
+  // Payment status
+  status          PaymentStatus @default(PENDING)
+  paymentType     String        @default("full")
+  milestoneNumber Int?
+  
+  // Escrow information
+  escrowStatus    String        @default("held")
+  releasedAt      DateTime?
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Review {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId             String   @unique @db.ObjectId
+  customerId          String   @db.ObjectId
+  artisanId           String   @db.ObjectId
+  
+  // Review details
+  rating              Int
+  title               String?
+  comment             String?
+  images              String[]
+  
+  // Review metadata
+  verifiedPurchase    Boolean  @default(true)
+  helpfulCount        Int      @default(0)
+  responseFromArtisan String?
+  responseAt          DateTime?
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  type      String
+  title     String
+  content   String?
+  data      Json?
+  
+  // Notification channels
+  emailSent Boolean  @default(false)
+  smsSent   Boolean  @default(false)
+  pushSent  Boolean  @default(false)
+  
+  // Status
+  readAt    DateTime?
+  clickedAt DateTime?
+  
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  CUSTOMER
+  ARTISAN
+  ADMIN
+}
+
+enum OrderStatus {
+  QUOTE_REQUESTED
+  QUOTE_SENT
+  QUOTE_ACCEPTED
+  IN_PROGRESS
+  PENDING_REVIEW
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  QUOTE
+  MILESTONE
+}
+
+enum PaymentMethod {
+  CARD
+  MPESA
+  BANK_TRANSFER
+  PAYPAL
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  DISPUTED
+}
+
+enum PriceType {
+  FIXED
+  HOURLY
+  CUSTOM
+}
