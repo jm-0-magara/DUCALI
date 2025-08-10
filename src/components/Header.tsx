@@ -39,13 +39,14 @@ export default function Header({ darkMode, toggleDarkMode }: HeaderProps) {
 
   return (
     <>
-      <header className={`shadow-lg sticky top-0 z-50 transition-colors duration-300 ${
-        darkMode ? 'bg-slate-900/95 backdrop-blur-md' : 'bg-slate-900/95 backdrop-blur-md'
-      }`}>
+      <header className={`shadow-lg sticky top-0 z-50 transition-colors duration-300 backdrop-blur-md`}
+               style={{
+                 backgroundColor: darkMode ? 'rgba(28, 28, 28, 0.95)' : 'rgba(29, 45, 80, 0.95)'
+               }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold" style={{ color: '#A4B465' }}>
+              <Link href="/" className="text-2xl font-bold" style={{ color: '#B08D57' }}>
                 Ducali
               </Link>
               <div className="text-sm text-slate-400 ml-2">Bespoke Marketplace</div>

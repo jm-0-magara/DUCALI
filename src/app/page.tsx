@@ -17,11 +17,12 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      darkMode 
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
-        : 'bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800'
-    }`}>
+    <div className={`min-h-screen transition-colors duration-300`}
+         style={{
+           background: darkMode 
+             ? 'linear-gradient(to bottom right, #1C1C1C, #1D2D50, #1C1C1C)'
+             : 'linear-gradient(to bottom right, #1D2D50, #B08D57, #6E1414)'
+         }}>
       <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <HeroSection />
       <Carousel />
