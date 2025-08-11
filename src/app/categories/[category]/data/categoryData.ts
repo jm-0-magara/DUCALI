@@ -87,10 +87,9 @@ export function getArtisansByCategory(categoryName: string): ArtisanProfile[] {
   try {
     const allArtisans = getAllArtisans();
     return allArtisans.filter((artisan: ArtisanProfile) => artisan.category === categoryName);
-  } catch (error) {
-    console.error('Error getting artisans by category:', error);
-    return [];
-  }
+      } catch {
+      return [];
+    }
 }
 
 export function getAllCategories(): CategoryInfo[] {

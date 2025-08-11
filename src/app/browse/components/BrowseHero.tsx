@@ -11,10 +11,10 @@ export default function BrowseHero({ searchTerm, setSearchTerm }: BrowseHeroProp
     <section className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Browse <span style={{ color: '#A4B465' }}>Artisans</span>
+          <h1 className="text-4xl md:text-5xl font-bold text-[#FDF6F0] mb-4">
+            Browse <span style={{ color: '#B08D57' }}>Artisans</span>
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+          <p className="text-xl text-[#FDF6F0]/80 max-w-2xl mx-auto">
             Discover talented creators and skilled artisans ready to bring your vision to life
           </p>
         </div>
@@ -28,7 +28,7 @@ export default function BrowseHero({ searchTerm, setSearchTerm }: BrowseHeroProp
               placeholder="Search artisans, specialties, or skills..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#A4B465] focus:ring-1 focus:ring-[#A4B465]"
+              className="w-full pl-12 pr-4 py-4 bg-[#1C1C1C] border border-[#B08D57]/30 rounded-lg text-[#FDF6F0] placeholder-[#FDF6F0]/40 focus:outline-none focus:border-[#B08D57] focus:ring-1 focus:ring-[#B08D57]"
             />
           </div>
         </div>

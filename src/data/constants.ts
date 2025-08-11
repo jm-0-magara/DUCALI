@@ -10,11 +10,11 @@ export const APP_CONFIG = {
 
 // Color Palette
 export const COLORS = {
-  primary: '#A4B465',      // Main green
-  primaryDark: '#626F47',  // Darker green
-  accent: '#F0BB78',       // Gold/yellow accent
-  background: '#F5ECD5',   // Light cream
-  dark: '#1E293B',         // Dark slate
+  primary: '#1D2D50',      // Navy Blue
+  secondary: '#6E1414',    // Wine Red
+  accent: '#B08D57',       // Muted Gold
+  background: '#FDF6F0',   // Cream
+  dark: '#1C1C1C',         // Charcoal Black
   slate: {
     50: '#F8FAFC',
     100: '#F1F5F9',

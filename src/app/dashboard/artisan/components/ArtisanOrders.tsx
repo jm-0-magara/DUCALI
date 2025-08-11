@@ -20,7 +20,7 @@ export function ArtisanOrders() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionResult, setActionResult] = useState<{ orderId: string; success: boolean; message: string } | null>(null);
 
-  const artisanOrders = user ? getArtisanOrders(user.id) : [];
+  const artisanOrders = user ? getArtisanOrders() : [];
   
   const filteredOrders = statusFilter === 'All Orders' 
     ? artisanOrders 
@@ -325,7 +325,7 @@ export function ArtisanOrders() {
                       </button>
                     </>
                   )}
-                  <button className="text-[#A4B465] hover:text-white transition-colors">
+                  <button className="text-[#B08D57] hover:text-[#FDF6F0] transition-colors">
                     View Details
                   </button>
                 </div>

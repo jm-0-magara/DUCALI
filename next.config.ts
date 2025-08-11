@@ -4,21 +4,31 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   experimental: {
     // Enable server actions if needed
-    serverActions: true,
+    serverActions: {
+      allowedOrigins: ['localhost:3000'],
+    },
   },
   images: {
-    domains: [
-      'localhost',
-      'ducali-uploads.s3.amazonaws.com', // Add your S3 bucket domain
-      'res.cloudinary.com', // If using Cloudinary
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ducali-uploads.s3.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
-  },
-  // API route configuration
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb', // Set file upload limit
-    },
-    externalResolver: true,
   },
   // Environment variables available to client
   env: {

@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { User } from '../../types';
+import { AdminNotifications } from '../../app/dashboard/admin/components/AdminNotifications';
 
 interface DashboardHeaderProps {
   user: User;
@@ -17,10 +18,11 @@ export function DashboardHeader({ user, logout }: DashboardHeaderProps) {
             <Link href="/" className="text-2xl font-bold text-[#A4B465]">Ducali</Link>
             <span className="text-slate-400">/</span>
             <span className="text-slate-300">
-              {user.role === 'customer' ? 'Customer' : 'Artisan'} Dashboard
+              {user.role === 'admin' ? 'Admin' : user.role === 'customer' ? 'Customer' : 'Artisan'} Dashboard
             </span>
           </div>
           <div className="flex items-center gap-4">
+            {user.role === 'admin' && <AdminNotifications />}
             <div className="text-right">
               <div className="text-white font-medium">{user.name}</div>
               <div className="text-slate-400 text-sm capitalize">

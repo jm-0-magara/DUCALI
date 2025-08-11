@@ -13,7 +13,7 @@ export function CustomerOrders() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionResult, setActionResult] = useState<{ orderId: string; success: boolean; message: string } | null>(null);
 
-  const customerOrders = user ? getCustomerOrders(user.id) : [];
+  const customerOrders = user ? getCustomerOrders() : [];
 
   const handleAcceptQuote = async (orderId: string) => {
     setActionLoading(orderId);
@@ -233,7 +233,7 @@ export function CustomerOrders() {
           </p>
           <Link
             href="/browse"
-            className="bg-[#626F47] text-white px-6 py-3 rounded-lg hover:bg-[#A4B465] transition-colors inline-flex items-center gap-2"
+            className="bg-[#6E1414] text-[#FDF6F0] px-6 py-3 rounded-lg hover:bg-[#6E1414]/80 transition-colors inline-flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
             Browse Artisans

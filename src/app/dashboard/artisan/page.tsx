@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   TrendingUp, 
   Package, 
@@ -23,6 +23,7 @@ import {
 export default function ArtisanDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Redirect if not authenticated or not an artisan
@@ -34,12 +35,20 @@ export default function ArtisanDashboard() {
     }
   }, [user, router]);
 
+  // Handle tab parameter from URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['overview', 'orders', 'portfolio', 'messages', 'settings'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
   // Loading state while checking authentication
   if (!user || user.role !== 'artisan') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 flex items-center justify-center">
         <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A4B465] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B08D57] mx-auto mb-4"></div>
           <p>Loading your dashboard...</p>
         </div>
       </div>

@@ -10,8 +10,8 @@ interface OrderContextType {
   orders: Order[];
   createOrder: (orderData: CreateOrderData) => Promise<{ success: boolean; orderId?: string; error?: string }>;
   updateOrderStatus: (orderId: string, status: Order['status'], progress?: number) => Promise<{ success: boolean; error?: string }>;
-  getCustomerOrders: (customerId: string) => Order[];
-  getArtisanOrders: (artisanId: string) => Order[];
+  getCustomerOrders: () => Order[];
+  getArtisanOrders: () => Order[];
   sendQuote: (orderId: string, price: string, timeline: string, notes?: string) => Promise<{ success: boolean; error?: string }>;
   acceptQuote: (orderId: string) => Promise<{ success: boolean; error?: string }>;
   completeOrder: (orderId: string) => Promise<{ success: boolean; error?: string }>;
@@ -45,8 +45,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       if (savedOrders) {
         setOrders(JSON.parse(savedOrders));
       }
-    } catch (error) {
-      console.error('Error loading orders:', error);
+    } catch {
+      // Error loading orders
     }
   }, []);
 
@@ -54,8 +54,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       localStorage.setItem(PLATFORM_SETTINGS.localStorageKeys.orders || 'ducali_orders', JSON.stringify(orders));
-    } catch (error) {
-      console.error('Error saving orders:', error);
+    } catch {
+      // Error saving orders
     }
   }, [orders]);
 
@@ -86,7 +86,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       setOrders(prev => [...prev, newOrder]);
       
       return { success: true, orderId: newOrder.id };
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Failed to create order. Please try again.' };
     } finally {
       setIsLoading(false);
@@ -112,7 +112,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Failed to update order status.' };
     } finally {
       setIsLoading(false);
@@ -139,7 +139,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Failed to send quote.' };
     } finally {
       setIsLoading(false);
@@ -164,7 +164,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Failed to accept quote.' };
     } finally {
       setIsLoading(false);
@@ -190,14 +190,14 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Failed to complete order.' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getCustomerOrders = (customerId: string) => {
+  const getCustomerOrders = () => {
     return orders.filter(order => {
       // For now, match by customer name since we don't have customer IDs in orders yet
       // In a real app, you'd match by customer ID
@@ -205,7 +205,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const getArtisanOrders = (artisanId: string) => {
+  const getArtisanOrders = () => {
     return orders.filter(order => {
       // For now, match by artisan name since we don't have artisan IDs in orders yet
       // In a real app, you'd match by artisan ID

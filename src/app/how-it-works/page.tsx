@@ -125,17 +125,17 @@ export default function HowItWorks() {
       {/* Hero Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            How <span style={{ color: '#A4B465' }}>Ducali</span> Works
+          <h1 className="text-4xl md:text-5xl font-bold text-[#FDF6F0] mb-6">
+            How <span style={{ color: '#B08D57' }}>Ducali</span> Works
           </h1>
-          <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-[#FDF6F0]/80 mb-8 max-w-2xl mx-auto">
             From discovery to delivery, we make it simple to connect with skilled artisans and bring your vision to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/browse" className="bg-[#626F47] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#A4B465] transition-colors">
+            <Link href="/browse" className="bg-[#6E1414] text-[#FDF6F0] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#6E1414]/80 transition-colors">
               Start Browsing Artisans
             </Link>
-            <Link href="#process" className="border-2 border-[#A4B465] text-[#A4B465] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#A4B465] hover:text-white transition-colors">
+            <Link href="#process" className="border-2 border-[#B08D57] text-[#B08D57] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#B08D57] hover:text-[#1C1C1C] transition-colors">
               See the Process
             </Link>
           </div>
@@ -232,16 +232,16 @@ export default function HowItWorks() {
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Project?</h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <h2 className="text-3xl font-bold text-[#FDF6F0] mb-4">Ready to Start Your Project?</h2>
+          <p className="text-xl text-[#FDF6F0]/80 mb-8">
             Join thousands of satisfied customers who&#39;ve brought their visions to life with Ducali&#39;s talented artisans.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/browse" className="bg-[#626F47] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#A4B465] transition-colors inline-flex items-center gap-2">
+            <Link href="/browse" className="bg-[#6E1414] text-[#FDF6F0] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#6E1414]/80 transition-colors inline-flex items-center gap-2">
               Browse Artisans
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/categories/fashion" className="border-2 border-[#A4B465] text-[#A4B465] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#A4B465] hover:text-white transition-colors">
+            <Link href="/categories/fashion" className="border-2 border-[#B08D57] text-[#B08D57] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#B08D57] hover:text-[#1C1C1C] transition-colors">
               Explore Categories
             </Link>
           </div>

@@ -1,7 +1,7 @@
 // src/app/dashboard/artisan/components/ArtisanOverview.tsx
 import React from 'react';
 import Link from 'next/link';
-import { Package, DollarSign, Star, Clock, Plus, Edit3, MessageCircle, TrendingUp } from 'lucide-react';
+import { Package, DollarSign, Star, Clock, Plus, Edit3, MessageCircle } from 'lucide-react';
 import { DashboardStats, Order } from '../../../../types';
 
 // Mock stats - in real app, this would come from props or API
@@ -118,7 +118,7 @@ export function ArtisanOverview() {
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-white">Recent Orders</h3>
-          <Link href="#" className="text-[#A4B465] hover:text-white transition-colors">
+          <Link href="/dashboard/artisan" className="text-[#A4B465] hover:text-white transition-colors">
             View All
           </Link>
         </div>

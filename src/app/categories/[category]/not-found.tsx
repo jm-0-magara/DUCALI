@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, Grid, Home } from 'lucide-react';
+import { Grid, Home } from 'lucide-react';
 
 export default function CategoryNotFound() {
   const validCategories = [

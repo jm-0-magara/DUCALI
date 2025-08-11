@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CarouselSlide {
@@ -80,10 +81,12 @@ export default function Carousel() {
               {carouselSlides.map((slide) => (
                 <div key={slide.id} className="w-full flex-shrink-0 relative">
                   <div className="h-96 relative overflow-hidden bg-gradient-to-br from-slate-700 to-slate-600">
-                    <img
+                    <Image
                       src={slide.image}
                       alt={slide.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                       <div className="text-center px-4">

@@ -40,8 +40,8 @@ export default function BrowseArtisans() {
   return (
     <div className={`min-h-screen transition-colors duration-300 ${
       darkMode 
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
-        : 'bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800'
+        ? 'bg-gradient-to-br from-[#1C1C1C] via-[#1D2D50] to-[#1C1C1C]' 
+        : 'bg-gradient-to-br from-[#1D2D50] via-[#B08D57] to-[#6E1414]'
     }`}>
       <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       

@@ -1,9 +1,12 @@
 // src/types/auth.ts
+import { PortfolioItem } from './artisan';
+import { Order } from './dashboard';
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'customer' | 'artisan';
+  role: 'customer' | 'artisan' | 'admin';
   profileImage?: string;
   verified?: boolean;
   joinDate: string;
@@ -26,13 +29,14 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isArtisan: boolean;
   isCustomer: boolean;
+  isAdmin: boolean;
 }
 
 export interface SignupData {
   name: string;
   email: string;
   password: string;
-  role: 'customer' | 'artisan';
+  role: 'customer' | 'artisan' | 'admin';
   specialty?: string;
   location?: string;
 }
@@ -41,7 +45,3 @@ export interface AuthResponse {
   success: boolean;
   error?: string;
 }
-
-// Re-export from other type files for convenience
-export type { Order } from './dashboard';
-export type { PortfolioItem } from './artisan';

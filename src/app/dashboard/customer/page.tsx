@@ -1,9 +1,9 @@
 // src/app/dashboard/customer/page.tsx
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Package, Heart, MessageCircle, Settings } from 'lucide-react';
 import { DashboardHeader, DashboardSidebar } from '../../../components/dashboard';
 import { CustomerOrders } from './components/CustomerOrders';
@@ -14,16 +14,25 @@ import { CustomerSettings } from './components/CustomerSettings';
 export default function CustomerDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('orders');
 
   // Redirect if not authenticated or not a customer
-  React.useEffect(() => {
+  useEffect(() => {
     if (!user) {
       router.push('/');
     } else if (user.role !== 'customer') {
       router.push('/dashboard/artisan');
     }
   }, [user, router]);
+
+  // Handle tab parameter from URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['orders', 'favorites', 'messages', 'settings'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   if (!user || user.role !== 'customer') {
     return (

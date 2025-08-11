@@ -44,7 +44,7 @@ export function ArtisanMessages() {
   const [filter, setFilter] = useState('all');
 
   const filteredMessages = mockMessages.filter(message => {
-    const matchesSearch = message.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (message.customer?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
                          message.lastMessage.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filter === 'all' || 
                          (filter === 'unread' && message.unread) ||
@@ -105,10 +105,10 @@ export function ArtisanMessages() {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-[#626F47] rounded-full flex items-center justify-center text-white text-sm">
-                        {message.customer.charAt(0)}
+                        {message.customer?.charAt(0) || '?'}
                       </div>
                       <div>
-                        <h4 className="text-white font-medium text-sm">{message.customer}</h4>
+                        <h4 className="text-white font-medium text-sm">{message.customer || 'Unknown Customer'}</h4>
                         <p className="text-slate-500 text-xs">Order #{message.orderId}</p>
                       </div>
                     </div>
@@ -134,10 +134,10 @@ export function ArtisanMessages() {
               <div className="p-4 border-b border-slate-700">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-[#626F47] rounded-full flex items-center justify-center text-white">
-                    {selectedMessage.customer.charAt(0)}
+                    {selectedMessage.customer?.charAt(0) || '?'}
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold">{selectedMessage.customer}</h3>
+                    <h3 className="text-white font-semibold">{selectedMessage.customer || 'Unknown Customer'}</h3>
                     <p className="text-slate-400 text-sm">Order #{selectedMessage.orderId}</p>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export function ArtisanMessages() {
                 <div className="flex justify-end">
                   <div className="bg-[#626F47] rounded-lg p-3 max-w-xs">
                     <p className="text-white text-sm">
-                      Hi! I'd be happy to discuss the design details with you. Let me know what specific beadwork style you have in mind.
+                      Hi! I&apos;d be happy to discuss the design details with you. Let me know what specific beadwork style you have in mind.
                     </p>
                     <p className="text-slate-300 text-xs mt-1">1 hour ago</p>
                   </div>

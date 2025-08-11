@@ -82,7 +82,7 @@ export default function ContactForm({ artisan }: ContactFormProps) {
         setOrderStatus('error');
         setOrderError(result.error || 'Failed to create order');
       }
-    } catch (err) {
+    } catch {
       setOrderStatus('error');
       setOrderError('An unexpected error occurred');
     }
@@ -301,7 +301,7 @@ export default function ContactForm({ artisan }: ContactFormProps) {
                 multiple
                 accept="image/*,.pdf,.doc,.docx"
                 disabled={!isAuthenticated}
-                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#626F47] file:text-white hover:file:bg-[#A4B465] transition-colors disabled:opacity-50"
+                className="w-full px-4 py-2 bg-[#1C1C1C] border border-[#B08D57]/30 rounded-lg text-[#FDF6F0] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6E1414] file:text-[#FDF6F0] hover:file:bg-[#6E1414]/80 transition-colors disabled:opacity-50"
               />
               <p className="text-slate-500 text-xs mt-1">
                 Accepted formats: JPG, PNG, PDF, DOC, DOCX (Max 10MB per file)
@@ -319,7 +319,7 @@ export default function ContactForm({ artisan }: ContactFormProps) {
             <button
               type="submit"
               disabled={!isAuthenticated || orderStatus === 'creating'}
-              className="w-full bg-[#626F47] text-white py-3 px-6 rounded-lg hover:bg-[#A4B465] transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#6E1414] text-[#FDF6F0] py-3 px-6 rounded-lg hover:bg-[#6E1414]/80 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {orderStatus === 'creating' ? (
                 <>
