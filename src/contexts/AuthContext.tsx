@@ -97,9 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(PLATFORM_SETTINGS.localStorageKeys.user, JSON.stringify(convertedUser));
       
       return { success: true };
-    } catch (error: any) {
-      console.error('Login error:', error);
-      return { success: false, error: error.message || 'Login failed. Please try again.' };
+    } catch (err: any) {
+      console.error('Login error:', err);
+      return { success: false, error: err.message || 'Login failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }
@@ -137,9 +137,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(PLATFORM_SETTINGS.localStorageKeys.user, JSON.stringify(convertedUser));
       
       return { success: true };
-    } catch (error: any) {
-      console.error('Signup error:', error);
-      return { success: false, error: error.message || 'Signup failed. Please try again.' };
+    } catch (err: any) {
+      console.error('Signup error:', err);
+      return { success: false, error: err.message || 'Signup failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }

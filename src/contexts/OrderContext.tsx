@@ -60,6 +60,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   }, [orders]);
 
   const createOrder = async (orderData: CreateOrderData) => {
+    // Destructure to avoid unused variable warnings
+    const { customerId: _customerId, artisanId: _artisanId, ...rest } = orderData;
     setIsLoading(true);
     
     // Simulate API delay
@@ -86,7 +88,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       setOrders(prev => [...prev, newOrder]);
       
       return { success: true, orderId: newOrder.id };
-    } catch {
+    } catch (err) {
+      console.error('Error creating order:', err);
       return { success: false, error: 'Failed to create order. Please try again.' };
     } finally {
       setIsLoading(false);
@@ -112,7 +115,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch {
+    } catch (err) {
+      console.error('Error updating order status:', err);
       return { success: false, error: 'Failed to update order status.' };
     } finally {
       setIsLoading(false);
@@ -139,7 +143,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch {
+    } catch (err) {
+      console.error('Error sending quote:', err);
       return { success: false, error: 'Failed to send quote.' };
     } finally {
       setIsLoading(false);
@@ -164,7 +169,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch {
+    } catch (err) {
+      console.error('Error accepting quote:', err);
       return { success: false, error: 'Failed to accept quote.' };
     } finally {
       setIsLoading(false);
@@ -190,7 +196,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       ));
       
       return { success: true };
-    } catch {
+    } catch (err) {
+      console.error('Error completing order:', err);
       return { success: false, error: 'Failed to complete order.' };
     } finally {
       setIsLoading(false);

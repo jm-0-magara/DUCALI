@@ -5,11 +5,11 @@ import { doc, updateDoc, getDoc, increment } from 'firebase/firestore';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: orderId } = await params;
   try {
     const { customerId, amount, paymentMethod, phoneNumber } = await request.json();
-    const orderId = params.id;
 
     if (!customerId || !amount || !paymentMethod) {
       return NextResponse.json(
@@ -19,6 +19,12 @@ export async function POST(
     }
 
     // Get the order
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database not initialized' },
+        { status: 500 }
+      );
+    }
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
 

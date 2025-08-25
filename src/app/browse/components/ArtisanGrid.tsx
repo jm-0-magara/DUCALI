@@ -40,18 +40,18 @@ export default function ArtisanGrid({
       {/* Artisan Grid/List - Mobile Optimized */}
       <div className={`${
         viewMode === 'grid' 
-          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6' 
-          : 'space-y-4'
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6' 
+          : 'space-y-3 sm:space-y-4'
       }`}>
         {artisans.map((artisan) => (
           <div
             key={artisan.id}
             className={`bg-slate-800 rounded-xl shadow-lg border border-slate-700 hover:shadow-xl hover:shadow-[#A4B465]/20 transition-all relative ${
-              viewMode === 'list' ? 'flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-6' : 'p-4 sm:p-6'
+              viewMode === 'list' ? 'flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 md:p-6' : 'p-3 sm:p-4 md:p-6'
             }`}
           >
             {/* Action Buttons - Mobile Optimized */}
-            <div className={`absolute top-3 right-3 z-10 flex items-center gap-2 ${
+            <div className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-10 flex items-center gap-1 sm:gap-2 ${
               viewMode === 'list' ? 'sm:relative sm:top-0 sm:right-0 sm:ml-auto' : ''
             }`}>
               <ComparisonButton

@@ -36,55 +36,55 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className={`relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 ${
+    <section className={`relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 ${
       isDark 
         ? 'bg-gradient-to-br from-charcoal-black via-navy-blue to-charcoal-black' 
         : 'bg-gradient-to-br from-[#F5F1EB] via-[#FAF7F2] to-[#F5F1EB]'
     }`}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
-          <h1 className={`font-bold mb-4 sm:mb-6 ${
+          <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight ${
             isDark ? 'text-cream' : 'text-charcoal-black'
           }`}>
             Bring Your <span className="text-muted-gold">Vision</span> to Life
           </h1>
-          <p className={`mb-6 sm:mb-8 max-w-3xl mx-auto ${
+          <p className={`text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto px-4 ${
             isDark ? 'text-cream/80' : 'text-charcoal-black/70'
           }`}>
             Connect with skilled artisans and creators to get custom-made products that are uniquely yours. 
             From wedding dresses to handcrafted furniture, we make bespoke accessible.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
             <button 
-              className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transform hover:scale-105 transition-all shadow-lg bg-wine-red text-cream hover:bg-wine-red/90 touch-manipulation"
+              className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transform hover:scale-105 transition-all shadow-lg bg-wine-red text-cream hover:bg-wine-red/90 touch-manipulation text-base sm:text-lg"
             >
               Start Your Custom Order
             </button>
             <Link 
               href="/browse" 
-              className="border-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transition-all inline-block text-center hover:opacity-80 border-muted-gold text-muted-gold hover:bg-muted-gold hover:text-white touch-manipulation"
+              className="border-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transition-all inline-block text-center hover:opacity-80 border-muted-gold text-muted-gold hover:bg-muted-gold hover:text-white touch-manipulation text-base sm:text-lg"
             >
               Browse Artisans
             </Link>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-muted-gold">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto px-4">
+            <div className="text-center p-4 sm:p-6 bg-white/5 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-muted-gold">
                 {loading ? '...' : `${stats.totalArtisans}+`}
               </div>
               <div className={`text-sm sm:text-base ${isDark ? 'text-cream/60' : 'text-charcoal-black/60'}`}>Verified Artisans</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-muted-gold">
+            <div className="text-center p-4 sm:p-6 bg-white/5 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-muted-gold">
                 {loading ? '...' : `${stats.totalOrders.toLocaleString()}+`}
               </div>
               <div className={`text-sm sm:text-base ${isDark ? 'text-cream/60' : 'text-charcoal-black/60'}`}>Orders Completed</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-muted-gold">
+            <div className="text-center p-4 sm:p-6 bg-white/5 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-muted-gold">
                 {loading ? '...' : `${stats.averageRating}★`}
               </div>
               <div className={`text-sm sm:text-base ${isDark ? 'text-cream/60' : 'text-charcoal-black/60'}`}>Average Rating</div>

@@ -1,7 +1,7 @@
 // src/app/dashboard/artisan/components/ArtisanOverview.tsx
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Package, DollarSign, Star, Clock, Plus, Edit3, MessageCircle, TrendingUp, Users, Award } from 'lucide-react';
+import { Package, DollarSign, Star, Clock, Plus, Edit3, MessageCircle, Users, Award, TrendingUp } from 'lucide-react';
 import { artisanDataService, ArtisanStats, ArtisanOrder } from '../../../../lib/artisanDataService';
 import { useAuth } from '../../../../contexts/AuthContext';
 
