@@ -1,21 +1,5 @@
 import { useState, useMemo } from 'react';
-
-interface Artisan {
-  id: number;
-  name: string;
-  specialty: string;
-  category: string;
-  rating: number;
-  orders: number;
-  location: string;
-  image: string;
-  price: string;
-  responseTime: string;
-  description: string;
-  skills: string[];
-  verified: boolean;
-  featured: boolean;
-}
+import { type Artisan } from '../../../lib/artisanService';
 
 export function useArtisanFilters(artisans: Artisan[]) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,10 +36,11 @@ export function useArtisanFilters(artisans: Artisan[]) {
         case 'rating':
           return b.rating - a.rating;
         case 'orders':
-          return b.orders - a.orders;
+          return b.totalOrders - a.totalOrders;
         case 'response':
-          const aTime = parseInt(a.responseTime);
-          const bTime = parseInt(b.responseTime);
+          // Parse response time strings like "Within 24 hours" to get numeric value
+          const aTime = parseInt(a.responseTime.replace(/\D/g, '') || '24');
+          const bTime = parseInt(b.responseTime.replace(/\D/g, '') || '24');
           return aTime - bTime;
         default:
           return 0;

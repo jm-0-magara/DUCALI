@@ -1,4 +1,6 @@
 // src/types/dashboard.ts
+import React from 'react';
+
 export interface Order {
   id: string;
   artisan?: string;
@@ -56,4 +58,6 @@ export interface MenuItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  description?: string;
+  badge?: string;
 }

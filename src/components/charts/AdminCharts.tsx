@@ -29,10 +29,12 @@ interface ChartData {
 
 interface RevenueChartProps {
   data: ChartData;
+  height?: number;
 }
 
 interface UserGrowthChartProps {
   data: ChartData;
+  height?: number;
 }
 
 interface CategoryChartProps {
@@ -41,16 +43,17 @@ interface CategoryChartProps {
     value: number;
     color: string;
   }>;
+  height?: number;
 }
 
-export function RevenueChart({ data }: RevenueChartProps) {
+export function RevenueChart({ data, height = 250 }: RevenueChartProps) {
   const chartData = data.labels.map((label, index) => ({
     month: label,
     revenue: data.datasets[0].data[index]
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis 
@@ -85,7 +88,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   );
 }
 
-export function UserGrowthChart({ data }: UserGrowthChartProps) {
+export function UserGrowthChart({ data, height = 250 }: UserGrowthChartProps) {
   const chartData = data.labels.map((label, index) => ({
     month: label,
     customers: data.datasets[0].data[index],
@@ -93,7 +96,7 @@ export function UserGrowthChart({ data }: UserGrowthChartProps) {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={height}>
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis 
@@ -133,16 +136,16 @@ export function UserGrowthChart({ data }: UserGrowthChartProps) {
   );
 }
 
-export function CategoryPieChart({ data }: CategoryChartProps) {
+export function CategoryPieChart({ data, height = 250 }: CategoryChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={height}>
       <PieChart>
         <Pie
           data={data}
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
@@ -165,9 +168,12 @@ export function CategoryPieChart({ data }: CategoryChartProps) {
   );
 }
 
-export function OrderStatusChart({ data }: { data: Array<{ status: string; count: number; color: string }> }) {
+export function OrderStatusChart({ data, height = 250 }: { 
+  data: Array<{ status: string; count: number; color: string }>;
+  height?: number;
+}) {
   return (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
         <XAxis 

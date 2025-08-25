@@ -1,17 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Header from '../../components/Header';
 import Footer from '../components/Footer';
 import { Search, MessageCircle, CreditCard, Package, Shield, Clock, Star, Users, CheckCircle, ArrowRight } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function HowItWorks() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const steps = [
     {
@@ -116,64 +114,86 @@ export default function HowItWorks() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${
-      darkMode 
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
-        : 'bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800'
+      isDark 
+        ? 'bg-gradient-to-br from-charcoal-black via-navy-blue to-charcoal-black' 
+        : 'bg-gradient-to-br from-[#F5F1EB] via-[#FAF7F2] to-[#F5F1EB]'
     }`}>
-      <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <Header />
       
       {/* Hero Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#FDF6F0] mb-6">
-            How <span style={{ color: '#B08D57' }}>Ducali</span> Works
+          <h1 className={`text-4xl md:text-5xl font-bold mb-6 ${
+            isDark ? 'text-[#FDF6F0]' : 'text-charcoal-black'
+          }`}>
+            How <span className="font-playfair" style={{ color: '#B08D57' }}>Ducali</span> Works
           </h1>
-          <p className="text-xl text-[#FDF6F0]/80 mb-8 max-w-2xl mx-auto">
+          <p className={`text-xl mb-8 max-w-2xl mx-auto ${
+            isDark ? 'text-[#FDF6F0]/80' : 'text-charcoal-black/70'
+          }`}>
             From discovery to delivery, we make it simple to connect with skilled artisans and bring your vision to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/browse" className="bg-[#6E1414] text-[#FDF6F0] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#6E1414]/80 transition-colors">
+            <Link href="/browse" className={`px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${
+              isDark ? 'bg-[#6E1414] text-[#FDF6F0] hover:bg-[#6E1414]/80' : 'bg-wine-red text-cream hover:bg-wine-red/80'
+            }`}>
               Start Browsing Artisans
             </Link>
-            <Link href="#process" className="border-2 border-[#B08D57] text-[#B08D57] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#B08D57] hover:text-[#1C1C1C] transition-colors">
+            <Link href="#process" className={`border-2 border-muted-gold text-muted-gold px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${
+              isDark ? 'hover:bg-[#B08D57] hover:text-[#1C1C1C]' : 'hover:bg-muted-gold hover:text-charcoal-black'
+            }`}>
               See the Process
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Process Steps */}
-      <section id="process" className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Simple 4-Step Process</h2>
-            <p className="text-xl text-slate-300">Getting your custom creation is easier than you think</p>
+             {/* Process Steps */}
+       <section id="process" className={`py-16 px-4 sm:px-6 lg:px-8 ${
+         isDark ? 'bg-slate-800' : 'bg-muted'
+       }`}>
+         <div className="max-w-7xl mx-auto">
+           <div className="text-center mb-12">
+             <h2 className={`text-3xl font-bold mb-4 ${
+               isDark ? 'text-white' : 'text-charcoal-black'
+             }`}>Simple 4-Step Process</h2>
+             <p className={`text-xl ${
+               isDark ? 'text-slate-300' : 'text-charcoal-black/70'
+             }`}>Getting your custom creation is easier than you think</p>
           </div>
 
           <div className="space-y-16">
             {steps.map((step, index) => (
               <div key={index} className={`flex flex-col lg:flex-row items-center gap-8 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
                 <div className="lg:w-1/2">
-                  <div className="bg-slate-900 rounded-2xl p-8 border border-slate-700">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="bg-[#626F47] p-3 rounded-full text-white">
-                        {step.icon}
-                      </div>
-                      <div>
-                        <div className="text-[#A4B465] font-mono text-sm mb-1">STEP {step.number}</div>
-                        <h3 className="text-2xl font-bold text-white">{step.title}</h3>
-                      </div>
-                    </div>
-                    <p className="text-slate-300 text-lg mb-6">{step.description}</p>
-                    <ul className="space-y-2">
-                      {step.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-slate-400">
-                          <CheckCircle className="w-4 h-4 text-[#A4B465] flex-shrink-0" />
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                                     <div className={`rounded-2xl p-8 border ${
+                     isDark ? 'bg-slate-900 border-slate-700' : 'bg-card border-border'
+                   }`}>
+                     <div className="flex items-center gap-4 mb-6">
+                       <div className="bg-[#626F47] p-3 rounded-full text-white">
+                         {step.icon}
+                       </div>
+                       <div>
+                         <div className="text-[#A4B465] font-mono text-sm mb-1">STEP {step.number}</div>
+                         <h3 className={`text-2xl font-bold ${
+                           isDark ? 'text-white' : 'text-charcoal-black'
+                         }`}>{step.title}</h3>
+                       </div>
+                     </div>
+                     <p className={`text-lg mb-6 ${
+                       isDark ? 'text-slate-300' : 'text-charcoal-black/70'
+                     }`}>{step.description}</p>
+                     <ul className="space-y-2">
+                       {step.details.map((detail, idx) => (
+                         <li key={idx} className={`flex items-center gap-2 ${
+                           isDark ? 'text-slate-400' : 'text-charcoal-black/60'
+                         }`}>
+                           <CheckCircle className="w-4 h-4 text-[#A4B465] flex-shrink-0" />
+                           <span>{detail}</span>
+                         </li>
+                       ))}
+                     </ul>
+                   </div>
                 </div>
                 <div className="lg:w-1/2 flex justify-center">
                   <div className="w-64 h-64 bg-gradient-to-br from-[#626F47] to-[#A4B465] rounded-full flex items-center justify-center text-white text-6xl">
@@ -186,67 +206,97 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      {/* Trust & Safety */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Your Trust & Safety</h2>
-            <p className="text-xl text-slate-300">We&#39;ve built multiple layers of protection for your peace of mind</p>
+             {/* Trust & Safety */}
+       <section className="py-16 px-4 sm:px-6 lg:px-8">
+         <div className="max-w-7xl mx-auto">
+           <div className="text-center mb-12">
+             <h2 className={`text-3xl font-bold mb-4 ${
+               isDark ? 'text-white' : 'text-charcoal-black'
+             }`}>Your Trust & Safety</h2>
+             <p className={`text-xl ${
+               isDark ? 'text-slate-300' : 'text-charcoal-black/70'
+             }`}>We&#39;ve built multiple layers of protection for your peace of mind</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {guarantees.map((guarantee, index) => (
-              <div key={index} className="bg-slate-800 rounded-xl p-6 border border-slate-700 text-center">
-                <div className="bg-[#626F47] p-3 rounded-full w-fit mx-auto mb-4 text-white">
-                  {guarantee.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{guarantee.title}</h3>
-                <p className="text-slate-400 text-sm">{guarantee.description}</p>
-              </div>
+                             <div key={index} className={`rounded-xl p-6 border text-center ${
+                 isDark ? 'bg-slate-800 border-slate-700' : 'bg-card border-border'
+               }`}>
+                 <div className="bg-[#626F47] p-3 rounded-full w-fit mx-auto mb-4 text-white">
+                   {guarantee.icon}
+                 </div>
+                 <h3 className={`text-lg font-semibold mb-2 ${
+                   isDark ? 'text-white' : 'text-charcoal-black'
+                 }`}>{guarantee.title}</h3>
+                 <p className={`text-sm ${
+                   isDark ? 'text-slate-400' : 'text-charcoal-black/60'
+                 }`}>{guarantee.description}</p>
+               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-800">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-slate-300">Everything you need to know about working with artisans on Ducali</p>
+             {/* FAQ Section */}
+       <section className={`py-16 px-4 sm:px-6 lg:px-8 ${
+         isDark ? 'bg-slate-800' : 'bg-muted'
+       }`}>
+         <div className="max-w-4xl mx-auto">
+           <div className="text-center mb-12">
+             <h2 className={`text-3xl font-bold mb-4 ${
+               isDark ? 'text-white' : 'text-charcoal-black'
+             }`}>Frequently Asked Questions</h2>
+             <p className={`text-xl ${
+               isDark ? 'text-slate-300' : 'text-charcoal-black/70'
+             }`}>Everything you need to know about working with artisans on Ducali</p>
           </div>
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <div key={index} className="bg-slate-900 rounded-lg border border-slate-700">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-white mb-3">{faq.question}</h3>
-                  <p className="text-slate-300">{faq.answer}</p>
-                </div>
-              </div>
+                             <div key={index} className={`rounded-lg border ${
+                 isDark ? 'bg-slate-900 border-slate-700' : 'bg-card border-border'
+               }`}>
+                 <div className="p-6">
+                   <h3 className={`text-lg font-semibold mb-3 ${
+                     isDark ? 'text-white' : 'text-charcoal-black'
+                   }`}>{faq.question}</h3>
+                   <p className={`${
+                     isDark ? 'text-slate-300' : 'text-charcoal-black/70'
+                   }`}>{faq.answer}</p>
+                 </div>
+               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#FDF6F0] mb-4">Ready to Start Your Project?</h2>
-          <p className="text-xl text-[#FDF6F0]/80 mb-8">
-            Join thousands of satisfied customers who&#39;ve brought their visions to life with Ducali&#39;s talented artisans.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/browse" className="bg-[#6E1414] text-[#FDF6F0] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#6E1414]/80 transition-colors inline-flex items-center gap-2">
-              Browse Artisans
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link href="/categories/fashion" className="border-2 border-[#B08D57] text-[#B08D57] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#B08D57] hover:text-[#1C1C1C] transition-colors">
-              Explore Categories
-            </Link>
-          </div>
-        </div>
-      </section>
+             {/* CTA Section */}
+       <section className="py-16 px-4 sm:px-6 lg:px-8">
+         <div className="max-w-4xl mx-auto text-center">
+           <h2 className={`text-3xl font-bold mb-4 ${
+             isDark ? 'text-[#FDF6F0]' : 'text-charcoal-black'
+           }`}>Ready to Start Your Project?</h2>
+           <p className={`text-xl mb-8 ${
+             isDark ? 'text-[#FDF6F0]/80' : 'text-charcoal-black/70'
+           }`}>
+             Join thousands of satisfied customers who&#39;ve brought their visions to life with Ducali&#39;s talented artisans.
+           </p>
+           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+             <Link href="/browse" className={`px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-flex items-center gap-2 ${
+               isDark ? 'bg-[#6E1414] text-[#FDF6F0] hover:bg-[#6E1414]/80' : 'bg-wine-red text-cream hover:bg-wine-red/80'
+             }`}>
+               Browse Artisans
+               <ArrowRight className="w-5 h-5" />
+             </Link>
+             <Link href="/categories/fashion" className={`border-2 border-muted-gold text-muted-gold px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${
+               isDark ? 'hover:bg-[#B08D57] hover:text-[#1C1C1C]' : 'hover:bg-muted-gold hover:text-charcoal-black'
+             }`}>
+               Explore Categories
+             </Link>
+           </div>
+         </div>
+       </section>
 
       <Footer />
     </div>

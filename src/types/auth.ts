@@ -7,9 +7,11 @@ export interface User {
   email: string;
   name: string;
   role: 'customer' | 'artisan' | 'admin';
-  profileImage?: string;
+  profileImage?: string | null;
   verified?: boolean;
   joinDate: string;
+  phone?: string;
+  bio?: string;
   
   // Artisan-specific fields
   specialty?: string;
@@ -26,6 +28,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<AuthResponse>;
   signup: (userData: SignupData) => Promise<AuthResponse>;
   logout: () => void;
+  updateProfileImage: (profileImageUrl: string) => Promise<AuthResponse>;
   isAuthenticated: boolean;
   isArtisan: boolean;
   isCustomer: boolean;

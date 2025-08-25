@@ -124,7 +124,7 @@ model Order {
   // Pricing
   quotedPrice         Float?
   finalPrice          Float?
-  currency            String      @default("USD")
+  currency            String      @default("KES")
   
   // Status and timeline
   status              OrderStatus @default(QUOTE_REQUESTED)
@@ -189,7 +189,7 @@ model Payment {
   
   // Payment details
   amount          Float
-  currency        String        @default("USD")
+  currency        String        @default("KES")
   paymentMethod   PaymentMethod
   paymentProvider String?
   transactionId   String?

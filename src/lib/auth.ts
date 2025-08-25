@@ -181,7 +181,7 @@ export async function authenticateRequest(request: Request) {
 // Helper function to get user from request
 export async function getUserFromRequest(request: Request) {
   const authResult = await authenticateRequest(request);
-  if (!authResult.success) {
+  if (!authResult.success || !('user' in authResult)) {
     return null;
   }
   return authResult.user;

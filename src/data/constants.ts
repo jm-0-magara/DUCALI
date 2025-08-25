@@ -50,7 +50,10 @@ export const ARTISAN_CATEGORIES = [
   { id: 'jewelry', name: 'Jewelry & Accessories', icon: '💍' },
   { id: 'art-design', name: 'Art & Design', icon: '🎨' },
   { id: 'food-catering', name: 'Food & Catering', icon: '🍰' },
-  { id: 'digital-services', name: 'Digital Services', icon: '💻' }
+  { id: 'digital-services', name: 'Digital Services', icon: '💻' },
+  { id: 'leather-crafts', name: 'Leather & Crafts', icon: '👜' },
+  { id: 'textiles-fabrics', name: 'Textiles & Fabrics', icon: '🧵' },
+  { id: 'wood-furniture', name: 'Wood & Furniture', icon: '🪑' }
 ];
 
 // Order Statuses
@@ -74,11 +77,11 @@ export const RESPONSE_TIMES = [
 
 // Budget Ranges
 export const BUDGET_RANGES = [
-  { value: 'under-100', label: 'Under $100' },
-  { value: '100-300', label: '$100 - $300' },
-  { value: '300-500', label: '$300 - $500' },
-  { value: '500-1000', label: '$500 - $1,000' },
-  { value: '1000-plus', label: '$1,000+' }
+  { value: 'under-10000', label: 'Under KSH 10,000' },
+  { value: '10000-30000', label: 'KSH 10,000 - KSH 30,000' },
+  { value: '30000-50000', label: 'KSH 30,000 - KSH 50,000' },
+  { value: '50000-100000', label: 'KSH 50,000 - KSH 100,000' },
+  { value: '100000-plus', label: 'KSH 100,000+' }
 ];
 
 // Project Timelines

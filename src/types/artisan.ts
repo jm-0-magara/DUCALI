@@ -1,14 +1,17 @@
 // src/types/artisan.ts
 export interface PortfolioItem {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  price: string;
-  timeframe: string;
-  placeholder: string; // Will be replaced with actual image URLs later
+  price?: string;
+  timeframe?: string;
+  placeholder?: string; // Will be replaced with actual image URLs later
   category?: string;
   views?: number;
   likes?: number;
+  mediaType?: 'image' | 'video';
+  mediaUrl?: string | null;
+  createdAt?: Date;
 }
 
 export interface Service {

@@ -1,6 +1,9 @@
 // scripts/seed-data.js
 // Run this script to seed Firebase with test data for development
 
+// Load environment variables first
+require('dotenv').config({ path: '.env.local' });
+
 const { seedFirebaseData } = require('../src/lib/seedFirebaseData.ts');
 
 async function main() {

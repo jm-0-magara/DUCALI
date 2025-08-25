@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Order } from '../types';
 import { useAuth } from './AuthContext';
-import { PLATFORM_SETTINGS } from '../data/constants';
+import { PLATFORM_SETTINGS } from '../data';
 
 interface OrderContextType {
   orders: Order[];

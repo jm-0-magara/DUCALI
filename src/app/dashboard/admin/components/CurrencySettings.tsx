@@ -1,127 +1,285 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Globe, ChevronDown, Check } from 'lucide-react';
-import { useCurrency, currencies } from '../../../../contexts/CurrencyContext';
+import React, { useState, useEffect } from 'react';
+import { 
+  CreditCard, 
+  Plus, 
+  X, 
+  Save,
+  Loader2,
+  AlertTriangle
+} from 'lucide-react';
+import { adminSettingsService, CurrencySettings as CurrencySettingsType } from '../../../../lib/adminSettingsService';
 
 export function CurrencySettings() {
-  const { selectedCurrency, setSelectedCurrency } = useCurrency();
-  const [isOpen, setIsOpen] = useState(false);
+  const [settings, setSettings] = useState<CurrencySettingsType>({
+    defaultCurrency: 'USD',
+    supportedCurrencies: ['USD', 'EUR', 'GBP', 'KES'],
+    exchangeRates: {
+      USD: 1,
+      EUR: 0.85,
+      GBP: 0.73,
+      KES: 110.5
+    }
+  });
 
-  const handleCurrencyChange = (currency: typeof currencies[0]) => {
-    setSelectedCurrency(currency);
-    setIsOpen(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newCurrency, setNewCurrency] = useState('');
+  const [newRate, setNewRate] = useState('');
+
+  useEffect(() => {
+    const fetchCurrencySettings = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const currencySettings = await adminSettingsService.getCurrencySettings();
+        setSettings(currencySettings);
+      } catch (error) {
+        console.error('Error fetching currency settings:', error);
+        setError('Failed to load currency settings. Using default values.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrencySettings();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      
+      await adminSettingsService.updateCurrencySettings(settings);
+      
+      // Show success message
+      setError(null);
+    } catch (error) {
+      console.error('Error saving currency settings:', error);
+      setError('Failed to save currency settings. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  return (
-    <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-white">Website Currency</h3>
-          <p className="text-slate-400 text-sm mt-1">
-            Choose the default currency for displaying prices across the website
-          </p>
+  const handleAddCurrency = () => {
+    if (!newCurrency || !newRate) return;
+    
+    const currency = newCurrency.toUpperCase();
+    const rate = parseFloat(newRate);
+    
+    if (isNaN(rate) || rate <= 0) {
+      setError('Please enter a valid exchange rate');
+      return;
+    }
+    
+    if (settings.supportedCurrencies.includes(currency)) {
+      setError('Currency already exists');
+      return;
+    }
+    
+    setSettings(prev => ({
+      ...prev,
+      supportedCurrencies: [...prev.supportedCurrencies, currency],
+      exchangeRates: {
+        ...prev.exchangeRates,
+        [currency]: rate
+      }
+    }));
+    
+    setNewCurrency('');
+    setNewRate('');
+    setError(null);
+  };
+
+  const handleRemoveCurrency = (currency: string) => {
+    if (currency === settings.defaultCurrency) {
+      setError('Cannot remove default currency');
+      return;
+    }
+    
+    setSettings(prev => ({
+      ...prev,
+      supportedCurrencies: prev.supportedCurrencies.filter(c => c !== currency),
+      exchangeRates: Object.fromEntries(
+        Object.entries(prev.exchangeRates).filter(([key]) => key !== currency)
+      )
+    }));
+    setError(null);
+  };
+
+  const handleRateChange = (currency: string, rate: string) => {
+    const numRate = parseFloat(rate);
+    if (isNaN(numRate) || numRate <= 0) return;
+    
+    setSettings(prev => ({
+      ...prev,
+      exchangeRates: {
+        ...prev.exchangeRates,
+        [currency]: numRate
+      }
+    }));
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-card/20 rounded-xl p-6 border border-border/5 backdrop-blur-sm">
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-accent-gold" />
         </div>
-        <Globe className="text-[#B08D57] h-6 w-6" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-card/20 rounded-xl p-6 border border-border/5 backdrop-blur-sm">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <CreditCard className="w-6 h-6 text-accent-gold mr-3" />
+          <h2 className="text-xl font-semibold text-white">Currency Settings</h2>
+        </div>
+        
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-4 py-2 bg-accent-gold text-charcoal-black rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent-gold/90 transition-colors flex items-center"
+        >
+          {saving ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 mr-2" />
+          )}
+          {saving ? 'Saving...' : 'Save'}
+        </button>
       </div>
 
-      <div className="space-y-4">
-        {/* Current Currency Display */}
-        <div className="bg-slate-700 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white font-medium">Current Currency</p>
-              <p className="text-slate-400 text-sm">
-                {selectedCurrency.name} ({selectedCurrency.code})
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-white font-semibold text-lg">
-                {selectedCurrency.symbol}
-              </p>
-              <p className="text-slate-400 text-xs">Symbol</p>
-            </div>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+          <div className="flex items-center text-red-400">
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {error}
           </div>
         </div>
+      )}
 
-        {/* Currency Selector */}
-        <div className="relative">
-          <label className="block text-sm font-medium text-white mb-2">
-            Select Currency
-          </label>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-left text-white hover:border-slate-500 transition-colors flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-3">
-              <span className="text-lg">{selectedCurrency.symbol}</span>
-              <div>
-                <p className="font-medium">{selectedCurrency.name}</p>
-                <p className="text-slate-400 text-sm">{selectedCurrency.code}</p>
+      {/* Default Currency */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-slate-gray mb-2">
+          Default Currency
+        </label>
+        <select
+          value={settings.defaultCurrency}
+          onChange={(e) => setSettings(prev => ({ ...prev, defaultCurrency: e.target.value }))}
+          className="w-full px-4 py-2 bg-slate-gray/3 border border-slate-gray/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-gold/20 focus:border-accent-gold/20"
+        >
+          {settings.supportedCurrencies.map(currency => (
+            <option key={currency} value={currency}>
+              {currency} ({getCurrencySymbol(currency)})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Exchange Rates */}
+      <div className="mb-6">
+        <h3 className="text-white font-medium mb-4">Exchange Rates (USD = 1.00)</h3>
+        <div className="space-y-3">
+          {settings.supportedCurrencies.map(currency => (
+            <div key={currency} className="flex items-center gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-slate-gray mb-1">
+                  {currency} ({getCurrencySymbol(currency)})
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={settings.exchangeRates[currency] || 0}
+                  onChange={(e) => handleRateChange(currency, e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-gray/3 border border-slate-gray/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent-gold/20 focus:border-accent-gold/20"
+                />
               </div>
-            </div>
-            <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {/* Dropdown */}
-          {isOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-slate-700 border border-slate-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {currencies.map((currency) => (
+              
+              {currency !== settings.defaultCurrency && (
                 <button
-                  key={currency.code}
-                  onClick={() => handleCurrencyChange(currency)}
-                  className={`w-full px-4 py-3 text-left hover:bg-slate-600 transition-colors flex items-center justify-between ${
-                    selectedCurrency.code === currency.code ? 'bg-slate-600' : ''
-                  }`}
+                  onClick={() => handleRemoveCurrency(currency)}
+                  className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                  title="Remove currency"
                 >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-lg">{currency.symbol}</span>
-                    <div>
-                      <p className="text-white font-medium">{currency.name}</p>
-                      <p className="text-slate-400 text-sm">{currency.code}</p>
-                    </div>
-                  </div>
-                  {selectedCurrency.code === currency.code && (
-                    <Check className="h-5 w-5 text-[#B08D57]" />
-                  )}
+                  <X className="w-4 h-4" />
                 </button>
-              ))}
+              )}
             </div>
-          )}
+          ))}
         </div>
+      </div>
 
-        {/* Currency Preview */}
-        <div className="bg-slate-700 rounded-lg p-4">
-          <h4 className="text-white font-medium mb-3">Currency Preview</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-400">Sample Price:</span>
-              <span className="text-white font-medium">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: selectedCurrency.code,
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2,
-                }).format(15000)}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-400">Exchange Rate:</span>
-              <span className="text-white font-medium">
-                1 KES = {selectedCurrency.rate} {selectedCurrency.code}
-              </span>
-            </div>
+      {/* Add New Currency */}
+      <div className="border-t border-border/5 pt-6">
+        <h3 className="text-white font-medium mb-4">Add New Currency</h3>
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-slate-gray mb-1">
+              Currency Code
+            </label>
+            <input
+              type="text"
+              value={newCurrency}
+              onChange={(e) => setNewCurrency(e.target.value.toUpperCase())}
+              placeholder="e.g., CAD"
+              className="w-full px-3 py-2 bg-slate-gray/3 border border-slate-gray/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent-gold/20 focus:border-accent-gold/20"
+            />
           </div>
-        </div>
-
-        {/* Info */}
-        <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-4">
-          <p className="text-blue-300 text-sm">
-            <strong>Note:</strong> Currency changes will affect all price displays across the website. 
-            Exchange rates are approximate and may need to be updated regularly for accuracy.
-          </p>
+          
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-slate-gray mb-1">
+              Exchange Rate (USD = 1.00)
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={newRate}
+              onChange={(e) => setNewRate(e.target.value)}
+              placeholder="e.g., 1.25"
+              className="w-full px-3 py-2 bg-slate-gray/3 border border-slate-gray/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent-gold/20 focus:border-accent-gold/20"
+            />
+          </div>
+          
+          <div className="flex items-end">
+            <button
+              onClick={handleAddCurrency}
+              disabled={!newCurrency || !newRate}
+              className="px-4 py-2 bg-accent-gold text-charcoal-black rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent-gold/90 transition-colors flex items-center"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+function getCurrencySymbol(currency: string): string {
+  const symbols: Record<string, string> = {
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    KES: 'KSh',
+    CAD: 'C$',
+    AUD: 'A$',
+    JPY: '¥',
+    CNY: '¥',
+    INR: '₹',
+    BRL: 'R$',
+    MXN: '$',
+    ZAR: 'R'
+  };
+  
+  return symbols[currency] || currency;
 }

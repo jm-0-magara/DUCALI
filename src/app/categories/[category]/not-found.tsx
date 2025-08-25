@@ -9,7 +9,10 @@ export default function CategoryNotFound() {
     { name: 'Jewelry & Accessories', slug: 'jewelry', icon: '💍' },
     { name: 'Art & Design', slug: 'art-design', icon: '🎨' },
     { name: 'Food & Catering', slug: 'food-catering', icon: '🍰' },
-    { name: 'Digital Services', slug: 'digital-services', icon: '💻' }
+    { name: 'Digital Services', slug: 'digital-services', icon: '💻' },
+    { name: 'Leather & Crafts', slug: 'leather-crafts', icon: '👜' },
+    { name: 'Textiles & Fabrics', slug: 'textiles-fabrics', icon: '🧵' },
+    { name: 'Wood & Furniture', slug: 'wood-furniture', icon: '🪑' }
   ];
 
   return (

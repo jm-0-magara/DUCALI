@@ -134,6 +134,10 @@ export const registerUser = async (
 
 // Login user
 export const loginUser = async (email: string, password: string): Promise<User> => {
+  if (!auth || !db) {
+    throw new Error('Firebase services not initialized');
+  }
+  
   try {
     console.log('Starting login for:', email);
     
@@ -188,6 +192,10 @@ export const loginUser = async (email: string, password: string): Promise<User> 
 
 // Logout user
 export const logoutUser = async (): Promise<void> => {
+  if (!auth) {
+    throw new Error('Firebase authentication not initialized');
+  }
+  
   try {
     await signOut(auth);
   } catch (error: any) {
@@ -198,6 +206,10 @@ export const logoutUser = async (): Promise<void> => {
 
 // Update user profile
 export const updateUserProfile = async (userId: string, updates: Partial<User>): Promise<void> => {
+  if (!auth || !db) {
+    throw new Error('Firebase services not initialized');
+  }
+  
   try {
     const userRef = doc(db, 'users', userId);
     
@@ -223,6 +235,10 @@ export const updateUserProfile = async (userId: string, updates: Partial<User>):
 
 // Get user by ID
 export const getUserById = async (userId: string): Promise<User | null> => {
+  if (!db) {
+    throw new Error('Firebase database not initialized');
+  }
+  
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
     
@@ -267,6 +283,11 @@ export const getUserById = async (userId: string): Promise<User | null> => {
 
 // Listen to auth state changes
 export const onAuthStateChange = (callback: (user: User | null) => void) => {
+  if (!auth || !db) {
+    console.warn('Firebase services not initialized, returning no-op function');
+    return () => {};
+  }
+  
   return onAuthStateChanged(auth, async (firebaseUser) => {
     console.log('Auth state changed - Firebase user:', firebaseUser ? firebaseUser.uid : 'null');
     
@@ -277,7 +298,7 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
         
         let userData = null;
         try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          const userDoc = await getDoc(doc(db!, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             userData = userDoc.data();
             console.log('Auth state change - User found in Firestore:', userData);
@@ -292,7 +313,7 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
               updatedAt: new Date(),
             };
             try {
-              await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+              await setDoc(doc(db!, 'users', firebaseUser.uid), userData);
             } catch (firestoreError: any) {
               console.warn('Firestore write failed in auth state change:', firestoreError.message);
             }

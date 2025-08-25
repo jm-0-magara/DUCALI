@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Shield, 
   CheckCircle, 
@@ -8,73 +8,86 @@ import {
   Star,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  Loader2
 } from 'lucide-react';
+import { artisanVerificationService, VerificationRequest } from '../../../../lib/artisanVerificationService';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 export function AdminArtisanVerification() {
-  const [filter, setFilter] = useState('pending');
+  const { user } = useAuth();
+  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [verificationRequests, setVerificationRequests] = useState<VerificationRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState<string | null>(null);
 
-  // Mock data - in real app, this would come from Firebase
-  const verificationRequests = [
-    {
-      id: '1',
-      name: 'Maria Rodriguez',
-      email: 'maria@example.com',
-      phone: '+1234567891',
-      location: 'Miami, FL',
-      specialty: 'Jewelry Making',
-      experience: '5 years',
-      portfolio: ['jewelry1.jpg', 'jewelry2.jpg', 'jewelry3.jpg'],
-      documents: ['id_verification.pdf', 'business_license.pdf'],
-      status: 'pending',
-      submittedAt: '2024-01-15',
-      rating: 4.8,
-      totalOrders: 0
-    },
-    {
-      id: '2',
-      name: 'John Smith',
-      email: 'john@example.com',
-      phone: '+1234567892',
-      location: 'New York, NY',
-      specialty: 'Woodworking',
-      experience: '8 years',
-      portfolio: ['wood1.jpg', 'wood2.jpg'],
-      documents: ['id_verification.pdf'],
-      status: 'approved',
-      submittedAt: '2024-01-10',
-      rating: 4.9,
-      totalOrders: 12
-    },
-    {
-      id: '3',
-      name: 'Sarah Wilson',
-      email: 'sarah@example.com',
-      phone: '+1234567893',
-      location: 'Los Angeles, CA',
-      specialty: 'Textile Design',
-      experience: '3 years',
-      portfolio: ['textile1.jpg', 'textile2.jpg', 'textile3.jpg'],
-      documents: ['id_verification.pdf', 'certificate.pdf'],
-      status: 'rejected',
-      submittedAt: '2024-01-08',
-      rating: 0,
-      totalOrders: 0
-    }
-  ];
+  // Fetch verification requests
+  useEffect(() => {
+    const fetchVerificationRequests = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const requests = await artisanVerificationService.getVerificationRequests();
+        setVerificationRequests(requests);
+      } catch (err) {
+        console.error('Error fetching verification requests:', err);
+        setError('Failed to load verification requests');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVerificationRequests();
+  }, []);
 
   const filteredRequests = verificationRequests.filter(request => 
     filter === 'all' || request.status === filter
   );
 
-  const handleApprove = (requestId: string) => {
-    console.log('Approve verification:', requestId);
-    // In real app, this would update the verification status
+  const handleApprove = async (requestId: string) => {
+    if (!user?.id) return;
+    
+    try {
+      setUpdating(requestId);
+      await artisanVerificationService.updateVerificationStatus(requestId, {
+        status: 'approved',
+        reviewedBy: user.id,
+        reviewNotes: 'Approved by admin'
+      });
+      
+      // Refresh the list
+      const requests = await artisanVerificationService.getVerificationRequests();
+      setVerificationRequests(requests);
+    } catch (err) {
+      console.error('Error approving verification:', err);
+      setError('Failed to approve verification');
+    } finally {
+      setUpdating(null);
+    }
   };
 
-  const handleReject = (requestId: string) => {
-    console.log('Reject verification:', requestId);
-    // In real app, this would update the verification status
+  const handleReject = async (requestId: string) => {
+    if (!user?.id) return;
+    
+    try {
+      setUpdating(requestId);
+      await artisanVerificationService.updateVerificationStatus(requestId, {
+        status: 'rejected',
+        reviewedBy: user.id,
+        reviewNotes: 'Rejected by admin'
+      });
+      
+      // Refresh the list
+      const requests = await artisanVerificationService.getVerificationRequests();
+      setVerificationRequests(requests);
+    } catch (err) {
+      console.error('Error rejecting verification:', err);
+      setError('Failed to reject verification');
+    } finally {
+      setUpdating(null);
+    }
   };
 
   const handleViewDetails = (requestId: string) => {
@@ -109,6 +122,38 @@ export function AdminArtisanVerification() {
         return null;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Artisan Verification</h1>
+          <p className="text-slate-400 mt-2">Review and manage artisan verification requests</p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="ml-2 text-slate-400">Loading verification requests...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Artisan Verification</h1>
+          <p className="text-slate-400 mt-2">Review and manage artisan verification requests</p>
+        </div>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+          <div className="flex items-center">
+            <XCircle className="w-5 h-5 text-red-400 mr-2" />
+            <span className="text-red-400">{error}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -292,17 +337,27 @@ export function AdminArtisanVerification() {
                   <>
                     <button
                       onClick={() => handleApprove(request.id)}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                      disabled={updating === request.id}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Approve
+                      {updating === request.id ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                      )}
+                      {updating === request.id ? 'Approving...' : 'Approve'}
                     </button>
                     <button
                       onClick={() => handleReject(request.id)}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                      disabled={updating === request.id}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <XCircle className="w-4 h-4 mr-2" />
-                      Reject
+                      {updating === request.id ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <XCircle className="w-4 h-4 mr-2" />
+                      )}
+                      {updating === request.id ? 'Rejecting...' : 'Reject'}
                     </button>
                   </>
                 )}

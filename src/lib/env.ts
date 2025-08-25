@@ -69,16 +69,16 @@ const envSchema = z.object({
   PRISMA_GENERATE_DATAPROXY: z.string().optional(),
 
   // Production Settings
-  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default('900000'),
-  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default('100'),
-  MAX_FILE_SIZE: z.string().transform(Number).default('10485760'),
+  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default(900000),
+  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default(100),
+  MAX_FILE_SIZE: z.string().transform(Number).default(10485760),
   ALLOWED_FILE_TYPES: z.string().default('image/jpeg,image/png,image/webp,application/pdf'),
 
   // Feature Flags
-  ENABLE_REAL_TIME_MESSAGING: z.string().transform(val => val === 'true').default('true'),
-  ENABLE_PUSH_NOTIFICATIONS: z.string().transform(val => val === 'true').default('true'),
-  ENABLE_ANALYTICS: z.string().transform(val => val === 'true').default('true'),
-  ENABLE_MONITORING: z.string().transform(val => val === 'true').default('true'),
+  ENABLE_REAL_TIME_MESSAGING: z.string().transform(val => val === 'true').default(true),
+  ENABLE_PUSH_NOTIFICATIONS: z.string().transform(val => val === 'true').default(true),
+  ENABLE_ANALYTICS: z.string().transform(val => val === 'true').default(true),
+  ENABLE_MONITORING: z.string().transform(val => val === 'true').default(true),
 });
 
 // Parse and validate environment variables

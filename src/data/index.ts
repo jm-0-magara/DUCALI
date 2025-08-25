@@ -1,15 +1,5 @@
 // src/data/index.ts
-// Export all mock data and constants
-
-export { mockUsers } from './mockUsers';
-export { 
-  mockCustomerOrders,
-  mockArtisanOrders,
-  mockFavoriteArtisans,
-  mockMessages,
-  mockArtisanStats,
-  mockCustomerStats
-} from './mockDashboardData';
+// Export constants and utilities
 
 export {
   APP_CONFIG,

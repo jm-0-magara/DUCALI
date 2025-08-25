@@ -39,8 +39,8 @@ export function EnhancedArtisanSettings({ user }: EnhancedArtisanSettingsProps) 
 
   const [businessSettings, setBusinessSettings] = useState({
     responseTime: '2 hours',
-    startingPrice: 'From $200',
-    currency: 'USD',
+    startingPrice: 'From KSH 20,000',
+    currency: 'KES',
     availability: 'available',
     autoAcceptOrders: false,
     requireDeposit: true,

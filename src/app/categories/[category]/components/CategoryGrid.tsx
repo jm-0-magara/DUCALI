@@ -1,23 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Star, MapPin, Clock } from 'lucide-react';
-
-interface Artisan {
-  id: number;
-  name: string;
-  specialty: string;
-  category: string;
-  rating: number;
-  orders: number;
-  location: string;
-  image: string;
-  price: string;
-  responseTime: string;
-  description: string;
-  skills: string[];
-  verified: boolean;
-  featured: boolean;
-}
+import { type Artisan } from '../../../../lib/artisanService';
 
 interface CategoryGridProps {
   artisans: Artisan[];
@@ -53,7 +37,19 @@ export default function CategoryGrid({ artisans, viewMode, searchTerm, categoryN
           >
             <div className={`${viewMode === 'list' ? 'flex-shrink-0' : 'mb-4'}`}>
               <div className="flex items-center gap-4">
-                <div className="text-4xl">{artisan.image}</div>
+                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center">
+                  <img 
+                    src={artisan.profileImage} 
+                    alt={artisan.name}
+                    className="w-full h-full rounded-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                  <div className="hidden text-2xl text-slate-400">👤</div>
+                </div>
                 {viewMode === 'grid' && (
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -85,7 +81,7 @@ export default function CategoryGrid({ artisans, viewMode, searchTerm, categoryN
                 <div className="flex items-center">
                   <Star className="w-5 h-5 fill-current" style={{ color: '#F0BB78' }} />
                   <span className="ml-1 text-slate-300">{artisan.rating}</span>
-                  <span className="ml-1 text-slate-400">({artisan.orders} orders)</span>
+                  <span className="ml-1 text-slate-400">({artisan.totalOrders} orders)</span>
                 </div>
                 <div className="flex items-center text-slate-400">
                   <MapPin className="w-4 h-4 mr-1" />
@@ -94,7 +90,7 @@ export default function CategoryGrid({ artisans, viewMode, searchTerm, categoryN
               </div>
 
               <div className="flex items-center justify-between mb-4">
-                <div className="font-semibold" style={{ color: '#A4B465' }}>{artisan.price}</div>
+                <div className="font-semibold" style={{ color: '#A4B465' }}>{artisan.priceRange}</div>
                 <div className="flex items-center text-slate-400">
                   <Clock className="w-4 h-4 mr-1" />
                   <span>{artisan.responseTime}</span>

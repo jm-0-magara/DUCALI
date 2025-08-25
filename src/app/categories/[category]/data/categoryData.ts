@@ -75,6 +75,36 @@ export const categories: CategoryInfo[] = [
     heroImage: '💻',
     subcategories: ['Web Development', 'Graphic Design', 'Photography', 'Video Editing', 'Marketing'],
     popularServices: ['Website Development', 'Logo Design', 'Social Media Marketing', 'Product Photography']
+  },
+  {
+    slug: 'leather-crafts',
+    name: 'Leather & Crafts',
+    displayName: 'Leather & Crafts',
+    description: 'Handcrafted leather goods, bags, wallets, and custom leather accessories made with traditional techniques.',
+    icon: '👜',
+    heroImage: '👜',
+    subcategories: ['Bags & Purses', 'Wallets', 'Belts', 'Shoes', 'Custom Leather Goods'],
+    popularServices: ['Custom Leather Bags', 'Personalized Wallets', 'Leather Belts', 'Shoe Repair']
+  },
+  {
+    slug: 'textiles-fabrics',
+    name: 'Textiles & Fabrics',
+    displayName: 'Textiles & Fabrics',
+    description: 'Handwoven fabrics, traditional textiles, and custom fabric designs for clothing and home decor.',
+    icon: '🧵',
+    heroImage: '🧵',
+    subcategories: ['Handwoven Fabrics', 'Traditional Textiles', 'Custom Prints', 'Fabric Dyeing', 'Textile Art'],
+    popularServices: ['Custom Fabric Design', 'Traditional Weaving', 'Fabric Dyeing', 'Textile Artwork']
+  },
+  {
+    slug: 'wood-furniture',
+    name: 'Wood & Furniture',
+    displayName: 'Wood & Furniture',
+    description: 'Handcrafted wooden furniture, custom carpentry, and woodworking services for your home and office.',
+    icon: '🪑',
+    heroImage: '🪑',
+    subcategories: ['Custom Furniture', 'Wood Carving', 'Cabinetry', 'Wooden Decor', 'Furniture Repair'],
+    popularServices: ['Custom Wooden Furniture', 'Kitchen Cabinets', 'Wood Carving', 'Furniture Restoration']
   }
 ];
 
@@ -83,13 +113,14 @@ export function getCategoryData(slug: string): CategoryInfo | null {
   return categories.find(cat => cat.slug === slug) || null;
 }
 
-export function getArtisansByCategory(categoryName: string): ArtisanProfile[] {
+export async function getArtisansByCategory(categoryName: string): Promise<ArtisanProfile[]> {
   try {
     const allArtisans = getAllArtisans();
-    return allArtisans.filter((artisan: ArtisanProfile) => artisan.category === categoryName);
-      } catch {
-      return [];
-    }
+    const artisans = await allArtisans;
+    return artisans.filter((artisan: ArtisanProfile) => artisan.category === categoryName);
+  } catch {
+    return [];
+  }
 }
 
 export function getAllCategories(): CategoryInfo[] {

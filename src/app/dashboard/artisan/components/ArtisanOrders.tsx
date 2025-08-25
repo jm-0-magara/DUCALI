@@ -1,352 +1,248 @@
-// src/app/dashboard/artisan/components/ArtisanOrders.tsx (Enhanced)
-import React, { useState } from 'react';
-import { Calendar, Clock, DollarSign, Send, CheckCircle, AlertCircle } from 'lucide-react';
+// src/app/dashboard/artisan/components/ArtisanOrders.tsx
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Calendar, Clock, Package, MessageSquare, Play, CheckCircle, AlertCircle, DollarSign, User } from 'lucide-react';
 import { useAuth } from '../../../../contexts';
-import { useOrders } from '../../../../contexts/OrderContext';
-import { StatusBadge } from '../../../../components/dashboard';
-import { Order } from '../../../../types';
+import { orderService } from '../../../../lib/orderService';
+import { useCurrency } from '../../../../contexts/CurrencyContext';
+import toast from 'react-hot-toast';
 
 export function ArtisanOrders() {
   const { user } = useAuth();
-  const { getArtisanOrders, sendQuote, updateOrderStatus, completeOrder } = useOrders();
-  const [statusFilter, setStatusFilter] = useState('All Orders');
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [quoteForm, setQuoteForm] = useState({
-    price: '',
-    timeline: '',
-    notes: ''
-  });
-  const [progressUpdate, setProgressUpdate] = useState<{ orderId: string; progress: string }>({ orderId: '', progress: '' });
+  const { formatCurrency } = useCurrency();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [actionResult, setActionResult] = useState<{ orderId: string; success: boolean; message: string } | null>(null);
 
-  const artisanOrders = user ? getArtisanOrders() : [];
-  
-  const filteredOrders = statusFilter === 'All Orders' 
-    ? artisanOrders 
-    : artisanOrders.filter((order: Order) => order.status === statusFilter);
+  // Load orders from Firebase
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!user?.id) return;
+      
+      try {
+        setLoading(true);
+        const userOrders = await orderService.getUserOrders(user.id, 'artisan');
+        setOrders(userOrders);
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        toast.error('Failed to load orders');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const getPriorityColor = (priority?: string) => {
-    switch (priority) {
-      case 'high': return 'border-l-red-400';
-      case 'medium': return 'border-l-yellow-400';
-      case 'low': return 'border-l-green-400';
-      default: return 'border-l-slate-400';
-    }
-  };
+    loadOrders();
+  }, [user?.id]);
 
-  const handleSendQuote = async (orderId: string) => {
-    if (!quoteForm.price || !quoteForm.timeline) {
-      setActionResult({ orderId, success: false, message: 'Please fill in price and timeline' });
-      setTimeout(() => setActionResult(null), 3000);
-      return;
-    }
-
+  const handleStartWork = async (orderId: string) => {
     setActionLoading(orderId);
-    const result = await sendQuote(orderId, quoteForm.price, quoteForm.timeline, quoteForm.notes);
     
-    if (result.success) {
-      setActionResult({ orderId, success: true, message: 'Quote sent successfully!' });
-      setSelectedOrder(null);
-      setQuoteForm({ price: '', timeline: '', notes: '' });
-    } else {
-      setActionResult({ orderId, success: false, message: result.error || 'Failed to send quote' });
+    try {
+      await orderService.updateOrderStatus(orderId, 'in_progress');
+      
+      // Update local state
+      setOrders(prev => prev.map(order => 
+        order.id === orderId 
+          ? { ...order, status: 'in_progress' }
+          : order
+      ));
+      
+      toast.success('Work started successfully!');
+    } catch (error) {
+      console.error('Error starting work:', error);
+      toast.error('Failed to start work');
+    } finally {
+      setActionLoading(null);
     }
-    
-    setActionLoading(null);
-    setTimeout(() => setActionResult(null), 3000);
-  };
-
-  const handleUpdateProgress = async (orderId: string) => {
-    const progress = parseInt(progressUpdate.progress);
-    if (isNaN(progress) || progress < 0 || progress > 100) {
-      setActionResult({ orderId, success: false, message: 'Please enter a valid progress percentage (0-100)' });
-      setTimeout(() => setActionResult(null), 3000);
-      return;
-    }
-
-    setActionLoading(orderId);
-    const result = await updateOrderStatus(orderId, 'In Progress', progress);
-    
-    if (result.success) {
-      setActionResult({ orderId, success: true, message: `Progress updated to ${progress}%` });
-      setProgressUpdate({ orderId: '', progress: '' });
-    } else {
-      setActionResult({ orderId, success: false, message: result.error || 'Failed to update progress' });
-    }
-    
-    setActionLoading(null);
-    setTimeout(() => setActionResult(null), 3000);
   };
 
   const handleCompleteOrder = async (orderId: string) => {
     setActionLoading(orderId);
-    const result = await completeOrder(orderId);
     
-    if (result.success) {
-      setActionResult({ orderId, success: true, message: 'Order marked as completed!' });
-    } else {
-      setActionResult({ orderId, success: false, message: result.error || 'Failed to complete order' });
+    try {
+      await orderService.updateOrderStatus(orderId, 'review');
+      
+      // Update local state
+      setOrders(prev => prev.map(order => 
+        order.id === orderId 
+          ? { ...order, status: 'review' }
+          : order
+      ));
+      
+      toast.success('Order completed! Waiting for customer review.');
+    } catch (error) {
+      console.error('Error completing order:', error);
+      toast.error('Failed to complete order');
+    } finally {
+      setActionLoading(null);
     }
-    
-    setActionLoading(null);
-    setTimeout(() => setActionResult(null), 3000);
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-500';
+      case 'accepted': return 'bg-blue-500';
+      case 'in_progress': return 'bg-orange-500';
+      case 'review': return 'bg-purple-500';
+      case 'completed': return 'bg-green-500';
+      case 'cancelled': return 'bg-red-500';
+      default: return 'bg-slate-500';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending': return 'Pending';
+      case 'accepted': return 'Accepted';
+      case 'in_progress': return 'In Progress';
+      case 'review': return 'Under Review';
+      case 'completed': return 'Completed';
+      case 'cancelled': return 'Cancelled';
+      default: return status;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Orders Management</h2>
-          <p className="text-slate-400">{filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''} {statusFilter !== 'All Orders' ? `with status "${statusFilter}"` : 'total'}</p>
-        </div>
-        <div className="flex gap-2">
-          <select 
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
-          >
-            <option>All Orders</option>
-            <option>Quote Requested</option>
-            <option>Pending Review</option>
-            <option>In Progress</option>
-            <option>Completed</option>
-          </select>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Orders</h2>
+        <div className="text-sm text-slate-600 dark:text-slate-400">
+          {orders.length} active order{orders.length !== 1 ? 's' : ''}
         </div>
       </div>
 
-      {/* Action Result Message */}
-      {actionResult && (
-        <div className={`mb-6 p-4 rounded-lg border ${
-          actionResult.success 
-            ? 'bg-green-500/10 border-green-500/20 text-green-400' 
-            : 'bg-red-500/10 border-red-500/20 text-red-400'
-        }`}>
-          <div className="flex items-center gap-2">
-            {actionResult.success ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-            <span>{actionResult.message}</span>
-          </div>
-        </div>
-      )}
-
       {/* Orders List */}
-      {filteredOrders.length > 0 ? (
-        <div className="space-y-4">
-          {filteredOrders
-            .sort((a: Order, b: Order) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
-            .map((order: Order) => (
-            <div key={order.id} className={`bg-slate-800 rounded-xl p-6 border border-slate-700 border-l-4 ${getPriorityColor(order.priority)}`}>
-              <div className="flex items-start justify-between mb-4">
+      <div className="space-y-4">
+        {orders.length === 0 ? (
+          <div className="text-center py-12">
+            <Package className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Orders Yet</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              When customers accept your quotes, their orders will appear here.
+            </p>
+            <Link
+              href="/dashboard/artisan/quotes"
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center gap-2"
+            >
+              <Package className="w-4 h-4" />
+              View Quote Requests
+            </Link>
+          </div>
+        ) : (
+          orders.map((order) => (
+            <div key={order.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              {/* Order Header */}
+              <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-white font-semibold">{order.service}</h3>
-                  <p className="text-slate-400">Customer: {order.customer}</p>
-                  <p className="text-slate-500 text-sm">Order #{order.id}</p>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                    {order.description || 'Project Order'}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Order #{order.id.slice(-8)}
+                  </p>
                 </div>
-                <div className="text-right">
-                  <StatusBadge status={order.status} />
-                  <div className="text-[#A4B465] font-semibold mt-2">{order.price}</div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(order.status)}`}>
+                    {getStatusText(order.status)}
+                  </span>
                 </div>
               </div>
 
-              {/* Order Description */}
-              <div className="mb-4">
-                <p className="text-slate-300 text-sm">{order.description}</p>
+              {/* Order Details */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-600 dark:text-slate-400">Amount:</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {formatCurrency(order.amount)} {order.currency}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-600 dark:text-slate-400">Timeline:</span>
+                  <span className="font-medium text-slate-900 dark:text-white">
+                    {order.timeline}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-600 dark:text-slate-400">Created:</span>
+                  <span className="text-slate-900 dark:text-white">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
               </div>
 
-              {/* Budget and Timeline Info */}
-              {(order.budget || order.timeline) && (
-                <div className="flex gap-4 mb-4 text-sm">
-                  {order.budget && (
-                    <div className="flex items-center gap-1 text-slate-400">
-                      <DollarSign className="w-4 h-4" />
-                      <span>Customer Budget: {order.budget}</span>
-                    </div>
-                  )}
-                  {order.timeline && (
-                    <div className="flex items-center gap-1 text-slate-400">
-                      <Clock className="w-4 h-4" />
-                      <span>Requested Timeline: {order.timeline}</span>
-                    </div>
-                  )}
+              {/* Order Actions */}
+              <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <MessageSquare className="w-4 h-4" />
+                  <span>{order.messages?.length || 0} messages</span>
                 </div>
-              )}
-
-              {/* Quote Form for Quote Requested Orders */}
-              {order.status === 'Quote Requested' && selectedOrder === order.id && (
-                <div className="mb-4 p-4 bg-slate-700 rounded-lg">
-                  <h4 className="text-white font-medium mb-3">Send Quote</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <label className="block text-sm text-slate-300 mb-1">Price *</label>
-                      <input
-                        type="text"
-                        value={quoteForm.price}
-                        onChange={(e) => setQuoteForm({...quoteForm, price: e.target.value})}
-                        placeholder="e.g., $450"
-                        className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white placeholder-slate-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-slate-300 mb-1">Timeline *</label>
-                      <input
-                        type="text"
-                        value={quoteForm.timeline}
-                        onChange={(e) => setQuoteForm({...quoteForm, timeline: e.target.value})}
-                        placeholder="e.g., 4-6 weeks"
-                        className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white placeholder-slate-400"
-                      />
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="block text-sm text-slate-300 mb-1">Additional Notes</label>
-                    <textarea
-                      value={quoteForm.notes}
-                      onChange={(e) => setQuoteForm({...quoteForm, notes: e.target.value})}
-                      placeholder="Any additional information about the project..."
-                      rows={3}
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white placeholder-slate-400 resize-none"
-                    />
-                  </div>
-                  <div className="flex gap-2">
+                
+                <div className="flex gap-2">
+                  {order.status === 'accepted' && (
                     <button
-                      onClick={() => handleSendQuote(order.id)}
+                      onClick={() => handleStartWork(order.id)}
                       disabled={actionLoading === order.id}
-                      className="bg-[#626F47] text-white px-4 py-2 rounded-lg hover:bg-[#A4B465] transition-colors flex items-center gap-2 disabled:opacity-50"
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50"
                     >
                       {actionLoading === order.id ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Sending...
+                          Starting...
                         </>
                       ) : (
                         <>
-                          <Send className="w-4 h-4" />
-                          Send Quote
+                          <Play className="w-4 h-4" />
+                          Start Work
                         </>
                       )}
                     </button>
-                    <button
-                      onClick={() => setSelectedOrder(null)}
-                      className="border border-slate-600 text-slate-300 px-4 py-2 rounded-lg hover:border-slate-500 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Progress Update for In Progress Orders */}
-              {order.status === 'In Progress' && (
-                <>
-                  {order.progress !== undefined && (
-                    <div className="mb-4">
-                      <div className="flex justify-between text-sm text-slate-400 mb-2">
-                        <span>Current Progress</span>
-                        <span>{order.progress}%</span>
-                      </div>
-                      <div className="w-full bg-slate-700 rounded-full h-2">
-                        <div 
-                          className="bg-[#A4B465] h-2 rounded-full transition-all"
-                          style={{ width: `${order.progress}%` }}
-                        />
-                      </div>
-                    </div>
                   )}
                   
-                  {progressUpdate.orderId === order.id ? (
-                    <div className="mb-4 p-4 bg-slate-700 rounded-lg">
-                      <h4 className="text-white font-medium mb-3">Update Progress</h4>
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={progressUpdate.progress}
-                          onChange={(e) => setProgressUpdate({...progressUpdate, progress: e.target.value})}
-                          placeholder="Progress %"
-                          className="w-32 px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white placeholder-slate-400"
-                        />
-                        <button
-                          onClick={() => handleUpdateProgress(order.id)}
-                          disabled={actionLoading === order.id}
-                          className="bg-[#626F47] text-white px-4 py-2 rounded-lg hover:bg-[#A4B465] transition-colors disabled:opacity-50"
-                        >
-                          {actionLoading === order.id ? 'Updating...' : 'Update'}
-                        </button>
-                        <button
-                          onClick={() => setProgressUpdate({ orderId: '', progress: '' })}
-                          className="border border-slate-600 text-slate-300 px-4 py-2 rounded-lg hover:border-slate-500 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                </>
-              )}
-
-              {/* Order Footer */}
-              <div className="flex items-center justify-between text-sm text-slate-400 border-t border-slate-700 pt-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>Ordered {new Date(order.orderDate).toLocaleDateString()}</span>
-                  </div>
-                  {order.deadline && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>Due {new Date(order.deadline).toLocaleDateString()}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  {order.status === 'Quote Requested' && (
-                    <button 
-                      onClick={() => setSelectedOrder(selectedOrder === order.id ? null : order.id)}
-                      className="text-[#A4B465] hover:text-white transition-colors"
+                  {order.status === 'in_progress' && (
+                    <button
+                      onClick={() => handleCompleteOrder(order.id)}
+                      disabled={actionLoading === order.id}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
                     >
-                      {selectedOrder === order.id ? 'Cancel Quote' : 'Send Quote'}
+                      {actionLoading === order.id ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Completing...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          Complete Order
+                        </>
+                      )}
                     </button>
                   )}
-                  {order.status === 'In Progress' && (
-                    <>
-                      <button 
-                        onClick={() => setProgressUpdate(progressUpdate.orderId === order.id ? { orderId: '', progress: '' } : { orderId: order.id, progress: order.progress?.toString() || '0' })}
-                        className="text-blue-400 hover:text-white transition-colors"
-                      >
-                        {progressUpdate.orderId === order.id ? 'Cancel Update' : 'Update Progress'}
-                      </button>
-                      <button 
-                        onClick={() => handleCompleteOrder(order.id)}
-                        disabled={actionLoading === order.id}
-                        className="text-green-400 hover:text-white transition-colors disabled:opacity-50"
-                      >
-                        {actionLoading === order.id ? 'Completing...' : 'Mark Complete'}
-                      </button>
-                    </>
-                  )}
-                  <button className="text-[#B08D57] hover:text-[#FDF6F0] transition-colors">
+                  
+                  <Link
+                    href={`/dashboard/artisan/orders/${order.id}`}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                  >
+                    <Package className="w-4 h-4" />
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="bg-slate-800 rounded-xl p-12 border border-slate-700 text-center">
-          <div className="text-6xl mb-4">📋</div>
-          <h3 className="text-white font-semibold mb-2">
-            {statusFilter === 'All Orders' ? 'No Orders Yet' : `No ${statusFilter}`}
-          </h3>
-          <p className="text-slate-400">
-            {statusFilter === 'All Orders' 
-              ? 'Orders will appear here when customers request quotes from you.'
-              : `No orders found with status "${statusFilter}".`
-            }
-          </p>
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // src/app/dashboard/artisan/components/index.ts
 export { ArtisanOverview } from './ArtisanOverview';
 export { ArtisanOrders } from './ArtisanOrders';
-export { ArtisanPortfolioManager } from './ArtisanPortfolioManager';
+export { default as ArtisanPortfolioManager } from './ArtisanPortfolioManager';
 export { ArtisanMessages } from './ArtisanMessages';
-export { ArtisanSettings } from './ArtisanSettings';
+export { default as ArtisanSettings } from './ArtisanSettings';
